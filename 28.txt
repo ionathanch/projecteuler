@@ -1,0 +1,10 @@
+Upper-right: (2n-1)²
+Upper-left : (2n-1)² - (2n-2)
+Lower-left : (2n-1)² - 2(2n-2)
+Lower-right: (2n-1)² - 3(2n-2)
+
+Total (nth spiral): 4(2n-1)² - 6(2n-2)
+Spirals: ceiling(1001/2) = 501
+Sum_{n=2}^{n=501} 16n²-28n+16 = 669 171 000
+
+Answer = 669171001
