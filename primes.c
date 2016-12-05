@@ -52,7 +52,7 @@ bool isPrimeMem (int n, int* primes) {
  *
  *  N.B. numOfPrimesUpper is an upper-bound of 
  *      the prime-counting function, given by 
- *      n/ln(n) * (1 + 3/2 * 1/ln(n))
+ *      n/ln(n) * 1.25506
  *
  *  runs in O(n * sqrt(n)/ln(n)) (not a tight bound)
  *
@@ -66,19 +66,22 @@ int listOfPrimes (int n, int** primes_ptr, bool** primesTable_ptr) {
         return 0;
     }
 
-    int numOfPrimesUpper = (int) (n/log(n) * 
-                    (1 + 3/2 * 1/log(n)));
+    int numOfPrimesUpper = (int) (n/log(n) * 1.25506); 
     *primes_ptr = malloc (sizeof (int) * numOfPrimesUpper);
     int numOfPrimes = 0;
     for (int i = 0; i <= n; i++) {
         if (isPrimeMem (i, *primes_ptr)) {
-            (*primes_ptr)[numOfPrimes++] = i;
+            (*primes_ptr)[numOfPrimes] = i;
             (*primesTable_ptr)[i] = true;
+            numOfPrimes++;
         }
     }
-    if (numOfPrimes < numOfPrimesUpper)
-        *primes_ptr = realloc (*primes_ptr, 
-                        sizeof (int) * numOfPrimes);
+    if (numOfPrimes < numOfPrimesUpper) {
+        int* tmp = realloc (*primes_ptr, 
+                            sizeof (int) * numOfPrimes);
+        if (tmp != NULL)
+            *primes_ptr = tmp;
+    }
     
     return numOfPrimes;
 }
