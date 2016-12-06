@@ -8,12 +8,12 @@
  *  runs in O(sqrt(n))
  *
  */
-bool isPrime (int n) {
+bool isPrime (long n) {
     if (n == 0 || n == 1)
         return false;
 
-    int sqrtn = (int) sqrt (n);
-    for (int i = 2; i <= sqrtn; i++) {
+    long sqrtn = (long) sqrt (n);
+    for (long i = 2; i <= sqrtn; i++) {
         if (n % i == 0)
             return false;
     }
@@ -26,14 +26,14 @@ bool isPrime (int n) {
  *  runs in O(sqrt(n)/ln(n))
  *
  */
-bool isPrimeMem (int n, int* primes) {
+bool isPrimeMem (long n, long* primes) {
     if (n == 0 || n == 1)
         return false;
     if (n == 2 || n == 3)
         return true;
 
-    int sqrtn = (int) sqrt (n);
-    int i = 0;
+    long sqrtn = (long) sqrt (n);
+    long i = 0;
     while (primes[i] <= sqrtn) {
         if (n % primes[i++] == 0)
             return false;
@@ -58,7 +58,7 @@ bool isPrimeMem (int n, int* primes) {
  *
  */
 
-int listOfPrimes (int n, int** primes_ptr, bool** primesTable_ptr) {
+long listOfPrimes (long n, long** primes_ptr, bool** primesTable_ptr) {
     *primesTable_ptr = calloc (n + 1, sizeof (bool));
 
     if (n == 0 || n == 1) {
@@ -66,10 +66,10 @@ int listOfPrimes (int n, int** primes_ptr, bool** primesTable_ptr) {
         return 0;
     }
 
-    int numOfPrimesUpper = (int) (n/log(n) * 1.25506); 
-    *primes_ptr = malloc (sizeof (int) * numOfPrimesUpper);
-    int numOfPrimes = 0;
-    for (int i = 0; i <= n; i++) {
+    long numOfPrimesUpper = (long) (n/log(n) * 1.25506); 
+    *primes_ptr = malloc (sizeof (long) * numOfPrimesUpper);
+    long numOfPrimes = 0;
+    for (long i = 0; i <= n; i++) {
         if (isPrimeMem (i, *primes_ptr)) {
             (*primes_ptr)[numOfPrimes] = i;
             (*primesTable_ptr)[i] = true;
@@ -77,8 +77,8 @@ int listOfPrimes (int n, int** primes_ptr, bool** primesTable_ptr) {
         }
     }
     if (numOfPrimes < numOfPrimesUpper) {
-        int* tmp = realloc (*primes_ptr, 
-                            sizeof (int) * numOfPrimes);
+        long* tmp = realloc (*primes_ptr, 
+                             sizeof (long) * numOfPrimes);
         if (tmp != NULL)
             *primes_ptr = tmp;
     }
