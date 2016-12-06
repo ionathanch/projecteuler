@@ -25,13 +25,13 @@ bool isRightTrunc (int n) {
 }
 
 int main () {
-    int* primes;
-    int numOfPrimes = listOfPrimes (1000000, &primes, &primesTable);
+    long* primes;
+    long numOfPrimes = listOfPrimes (1000000, &primes, &primesTable);
     // unfortunately I couldn't find a deterministic way to find
     // the upper-bound of all truncatable primes... 1 mil will do
     
-    int sum = 0;
-    for (int i = 0; i < numOfPrimes; i++) {
+    long sum = 0;
+    for (long i = 0; i < numOfPrimes; i++) {
         if (isLeftTrunc (primes[i]) &&
             isRightTrunc (primes[i]) &&
             primes[i] > 10) {

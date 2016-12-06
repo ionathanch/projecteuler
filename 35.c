@@ -7,14 +7,14 @@
 int main () {
     int bound = 1000000;
 
-    int* primes;
+    long* primes;
     bool* primesTable;
-    int numPrimes = listOfPrimes (bound, &primes, &primesTable);
+    long numPrimes = listOfPrimes (bound, &primes, &primesTable);
 
     bool* circularPrimesTable = calloc (bound + 1, sizeof (bool));
-    for (int i = 0; i < numPrimes; i++) {
+    for (long i = 0; i < numPrimes; i++) {
         if (circularPrimesTable[primes[i]] != true) {
-            int n = primes[i];
+            long n = primes[i];
             int numOfDigits = floor (log10 (n)) + 1;
             int* digits = malloc (sizeof (int) * numOfDigits);
             for (int d = 0; d < numOfDigits; d++) {
