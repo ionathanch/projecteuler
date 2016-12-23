@@ -9,6 +9,7 @@ patterns = list(set(list(it.permutations(permupattern, length))))
 digits   = list(it.product(range(0, 10), repeat=length-repeats))
 
 for pattern in patterns:
+    breakout = False
     for digit in digits:
         family = []
         for i in range(0, 10):
@@ -25,3 +26,7 @@ for pattern in patterns:
                 family.append(num)
         if family and len(filter(lambda n: gmpy2.is_prime(n), family)) == familysize: 
             print family
+            breakout = True
+            break
+    if breakout:
+        break
