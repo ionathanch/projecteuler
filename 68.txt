@@ -1,0 +1,16 @@
+I solved this by hand so I'll only give a brief outline of how.
+
+For a magic n-gon ring, its magic number is given by
+    (2*(sum of inside nodes) + (sum of outside nodes))/n
+The maximal smallest outside node is (n+1) with the outside nodes as [n+1, n+2, ..., 2n-1, 2n].
+
+For n = 5, the magic number is 14. 
+The outside nodes are [6, 7, 8, 9, 10] and the inside nodes are [1, 2, 3, 4, 5]. 
+To obtain a maximal 16-digit string, 6 must be connected to 5, so the first triple is 6-5-3.
+The only way for a triple to contain 10 and add up to 14 is using a permutation of 10-3-1.
+Therefore, the next triple going clockwise must be 10-3-1. 
+Following that, a maximal 16-digit string could contain 9, 8, 7 as the next outside nodes.
+Using these values indeed yields a correct magic 5-gon ring.
+The maximal 16-digit string is then constructed from the solution set
+    6, 5, 3; 10, 3, 1; 9, 1, 4; 8, 4, 2; 7, 2, 5
+or 6531031914842725.
