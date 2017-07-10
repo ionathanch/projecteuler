@@ -1,4 +1,5 @@
 import Data.Char (digitToInt)
+import qualified Data.Map as Map
 
 digitFactorial :: Integer -> Integer
 digitFactorial n = case n of 
@@ -13,29 +14,26 @@ digitFactorial n = case n of
     8 -> 40320
     9 -> 362880
 
-sizeOfLoop :: Integer -> Integer
-sizeOfLoop n 
-    | n == 169 || n == 363601 || n == 1454 = 3
-    | n == 871 || n == 45361 = 2
-    | n == 872 || n == 45362 = 2
-    | n == 145 || n == 1 || n == 2 = 1
-    | otherwise = 0
+type ChainMap = Map.Map Integer Integer
+initialMap :: ChainMap
+initialMap = Map.fromList [(169, 3), (363601, 3), (1454, 3),
+                           (871, 2), (872, 2), (45361, 2), (45362, 2),
+                           (1, 1), (2, 1), (145, 1)]
 
 sumOfFactorialOfDigits :: Integer -> Integer
 sumOfFactorialOfDigits n = sum $ map (digitFactorial . fromIntegral . digitToInt) $ show n
 
-getChainLength :: Integer -> Integer
-getChainLength n = getChainLengthRec n 1
+getChainLength :: Integer -> ChainMap -> (Integer, ChainMap)
+getChainLength n chainMap = case Map.lookup n chainMap of 
+    Just length -> (length, chainMap)
+    Nothing     -> let next = sumOfFactorialOfDigits n
+                       (nextLength, nextChainMap) = getChainLength next chainMap
+                       length = nextLength + 1
+                   in (length, Map.insert n length nextChainMap)
 
-getChainLengthRec :: Integer -> Integer -> Integer
-getChainLengthRec n length = 
-    let next = sumOfFactorialOfDigits n
-        nextLength = sizeOfLoop next
-    in if nextLength == 0 
-       then getChainLengthRec next (length + 1)
-       else length + nextLength
-       
-numOfLoops :: Integer -> Integer -> Integer
-numOfLoops bound length = foldr (\n num -> num + if getChainLength n == length then 1 else 0) 0 [3..bound]
+numOfLoops :: Integer -> Integer -> (Integer, ChainMap)
+numOfLoops bound length = foldr (\n (num, oldMap) -> let (chainLength, newMap) = getChainLength n oldMap
+                                                     in (num + if chainLength == length then 1 else 0, newMap)) (0, initialMap) [3..bound]
 
-main = print $ numOfLoops 1000000 60
+main = print $ let (length, sizeMap) = numOfLoops 10000 60
+               in length
