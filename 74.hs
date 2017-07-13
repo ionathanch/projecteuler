@@ -18,7 +18,7 @@ type ChainMap = Map.Map Integer Integer
 initialMap :: ChainMap
 initialMap = Map.fromList [(169, 3), (363601, 3), (1454, 3),
                            (871, 2), (872, 2), (45361, 2), (45362, 2),
-                           (1, 1), (2, 1), (145, 1)]
+                           (1, 1), (2, 1), (145, 1), (40585, 1)]
 
 sumOfFactorialOfDigits :: Integer -> Integer
 sumOfFactorialOfDigits n = sum $ map (digitFactorial . fromIntegral . digitToInt) $ show n
@@ -35,5 +35,5 @@ numOfLoops :: Integer -> Integer -> (Integer, ChainMap)
 numOfLoops bound length = foldr (\n (num, oldMap) -> let (chainLength, newMap) = getChainLength n oldMap
                                                      in (num + if chainLength == length then 1 else 0, newMap)) (0, initialMap) [3..bound]
 
-main = print $ let (length, sizeMap) = numOfLoops 10000 60
+main = print $ let (length, sizeMap) = numOfLoops 1000000 60
                in length
