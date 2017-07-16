@@ -1,0 +1,9 @@
+Did this one by hand: 73162890
+
+Algorithm:
+    For each three-digit sequence jkl,
+        If there's no path from j to k or k to l,
+            Draw such a directed edge from j to k or k to l
+        If there's more than one path from any m to n
+            Remove all paths except for the longest
+    The result should be a linear acyclic chain
