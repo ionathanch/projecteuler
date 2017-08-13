@@ -12,6 +12,6 @@ main :: IO ()
 main = do 
     contents <- readFile "p081_matrix.txt"
     let fileLines = lines contents
-    let matrix = map (map read . (splitOn ",")) fileLines :: [[Integer]]
-    let initialLine = getInitialLine $ head matrix
+        matrix = map (map read . (splitOn ",")) fileLines
+        initialLine = getInitialLine $ head matrix
     print $ last $ foldl getNextLine initialLine $ tail matrix
