@@ -1,11 +1,27 @@
 import Data.List.Split
 import Data.Matrix
 import Data.Maybe
+import Data.Foldable
 
 type Value = Integer
 data IsVisited = Visited | Unvisited deriving (Eq, Show)
 type Position = (Int, Int)
 data Element = Element Value IsVisited Position deriving (Eq, Show)
+
+instance Monoid Element where
+    mempty = Element 0 Visited (0, 0)
+    e `mappend` Element _ Unvisited _ = e
+    Element _ Unvisited _ `mappend` e = e
+    Element v1 Visited p1 `mappend` Element v2 Visited p2 =
+        case getMin v1 v2 of 
+            0  -> mempty
+            v1 -> Element v1 Visited p1
+            v2 -> Element v2 Visited p2
+
+getMin :: Value -> Value -> Value
+getMin v1 0  = v1
+getMin 0  v2 = v2
+getMin v1 v2 = min v1 v2
 
 getUnvisitedNeighbours :: Matrix Element -> Element -> [Element]
 getUnvisitedNeighbours m (Element _ _ (i, j)) =
@@ -19,16 +35,10 @@ getNeighbourDistances :: Element -> [Element] -> [Element]
 getNeighbourDistances e = map (addValue e)
     where addValue (Element ve isVisited _) (Element vn _ p) = Element (ve + vn) isVisited p
 
-getMin :: Value -> Value -> Value
-getMin v1 0  = v1
-getMin 0  v2 = v2
-getMin v1 v2 = min v1 v2
-
-dijkstraMatrix :: Matrix Element -> (Value, Position)
+dijkstraMatrix :: Matrix Element -> Element
 dijkstraMatrix m = 
     let neighbourDistanceMatrix = fmap (\e -> getNeighbourDistances e (getUnvisitedNeighbours m e)) m
-    -- fold over Visited with getMin
-    in (0, (0, 0))
+    in fold (fmap fold neighbourDistanceMatrix)
     -- for unvisited element in matrix
         -- for unvisited neighbour of element
             -- if element value + neighbour value < min then set as min
@@ -36,7 +46,7 @@ dijkstraMatrix m =
 
 nextMatrix :: Matrix Element -> Matrix Element
 nextMatrix m =
-    let (minValue, position) = dijkstraMatrix m
+    let Element minValue _ position = dijkstraMatrix m
         maybeMatrix = safeSet (Element minValue Visited position) position m
     in case maybeMatrix of 
         Just next -> next
@@ -57,4 +67,4 @@ main = do
     let listsMatrix = map (map read . (splitOn ",")) $ lines contents :: [[Integer]]
         valueMatrix = fromLists listsMatrix
         mtrx = toElementMatrix valueMatrix
-    print mtrx
+    print $ nextMatrix mtrx
