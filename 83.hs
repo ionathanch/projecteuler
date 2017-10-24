@@ -16,8 +16,8 @@ instance Monoid Element where
         case getMin v1 v2 of 
             0  -> mempty
             v -> if v == v1 
-                then Element v1 Visited p1
-                else Element v2 Visited p2
+                 then Element v1 Visited p1
+                 else Element v2 Visited p2
 
 getMin :: Value -> Value -> Value
 getMin v1 0  = v1
