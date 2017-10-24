@@ -5,11 +5,11 @@ import Data.Foldable
 import Data.PQueue.Min
 
 type Value = Integer
-type Distance = Maybe Integer  -- Nothing represents infinity
+type Distance = Integer
 type Position = (Int, Int)
 data Element = Element {
     value :: Value,
-    distance :: Distance,
+    distance :: Maybe Distance,  -- Nothing represents infinity
     position :: Position
  } deriving (Eq, Show)
 data PQE = PQE Element Distance deriving (Eq, Show)
@@ -19,29 +19,39 @@ instance Ord PQE where
     _ <= PQE _ Nothing = True
     PQE _ (Just d1) <= PQE _ (Just d2) = d1 <= d2
 
-dijkstra :: Matrix Element -> MinQueue PQE -> Position -> Distance
-dijkstra m q p =
+getNeighbours :: Matrix Element -> Element -> [Element]
+getNeighbours m e =
+    let (i, j) = position e
+    in  catMaybes [safeGet (i - 1) j      m,
+                   safeGet (i + 1) j      m,
+                   safeGet  i     (j - 1) m,
+                   safeGet  i     (j + 1) m]    
+
+dijkstra :: Position -> Matrix Element -> MinQueue PQE -> Distance
+dijkstra p m q =
     let PQE minElement minDistance = findMin q
     in  if position minElement == p
-        then distance minElement
-        else undefined --TODO
-
+        then minDistance
+        else let (newM, newQ) = foldr update (m, q) $ getNeighbours m minElement
+             in  dijkstra p newM newQ
+        where update neighbour (prevM, prevQ) =
+                let newDistance = minDistance + value neighbour
+                in  case distance neighbour of
+                    Nothing -> undefined
+                    Just d  -> undefined
 
 findShortestPathLength :: Matrix Element -> Distance
 findShortestPathLength m =
     let initialElement = m ! (1, 1)
-        initialMinQ = singleton $ PQE initialElement $ distance initialElement
+        initialMinQ = singleton $ PQE initialElement $ value initialElement
         lastPos = (nrows m, ncols m)
-    in  dijkstra m initialMinQ lastPos
+    in  dijkstra lastPos m initialMinQ
 
 
 setInitial :: Matrix Element -> Matrix Element
 setInitial m =
     let v = value $ m ! (1, 1)
-        maybeMatrix = safeSet (Element v (Just v) (1, 1)) (1, 1) m
-    in  case maybeMatrix of 
-        Just mm -> mm 
-        Nothing -> m
+    in unsafeSet (Element v (Just v) (1, 1)) (1, 1) m
 
 initElement :: Matrix Integer -> Position -> Element
 initElement m p =
