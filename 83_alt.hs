@@ -4,61 +4,65 @@ import Data.Maybe
 import Data.Foldable
 import Data.PQueue.Min
 
-type Value = Integer
+type Value    = Integer
 type Distance = Integer
 type Position = (Int, Int)
-data Element = Element {
+data MElement = MElement {
     value :: Value,
-    distance :: Maybe Distance,  -- Nothing represents infinity
-    position :: Position
- } deriving (Eq, Show)
-data PQE = PQE Element Distance deriving (Eq, Show)
+    visited :: Bool
+} deriving (Eq, Show)
+data QElement = QElement {
+    distance :: Distance,
+    position :: (Int, Int)
+} deriving (Eq, Show)
 
-instance Ord PQE where
-    PQE _ Nothing <= _ = False
-    _ <= PQE _ Nothing = True
-    PQE _ (Just d1) <= PQE _ (Just d2) = d1 <= d2
+instance Ord QElement where
+    QElement d1 p1 <= QElement d2 p2 = d1 <= d2
 
-getNeighbours :: Matrix Element -> Element -> [Element]
-getNeighbours m e =
-    let (i, j) = position e
-    in  catMaybes [safeGet (i - 1) j      m,
-                   safeGet (i + 1) j      m,
-                   safeGet  i     (j - 1) m,
-                   safeGet  i     (j + 1) m]    
+markVisited :: Position -> Matrix MElement -> Matrix MElement
+markVisited pos m =
+    let MElement value _ = m ! pos
+    in  unsafeSet (MElement value True) pos m
 
-dijkstra :: Position -> Matrix Element -> MinQueue PQE -> Distance
+getNeighbour :: Matrix MElement -> Distance -> Position -> Maybe QElement
+getNeighbour m dist pos@(i, j) = do
+    MElement val vis <- safeGet i j m
+    if vis then Nothing
+    else return $ QElement (dist + val) pos
+
+getNeighbours :: Matrix MElement -> QElement -> [QElement]
+getNeighbours m (QElement dist (i, j)) =
+    catMaybes [getNeighbour m dist ((i - 1), j),
+               getNeighbour m dist ((i + 1), j),
+               getNeighbour m dist (i, (j - 1)),
+               getNeighbour m dist (i, (j + 1))]
+
+dijkstra :: Position -> Matrix MElement -> MinQueue QElement -> Distance
 dijkstra p m q =
-    let PQE minElement minDistance = findMin q
-    in  if position minElement == p
-        then minDistance
-        else let (newM, newQ) = foldr update (m, q) $ getNeighbours m minElement
-             in  dijkstra p newM newQ
-        where update neighbour (prevM, prevQ) =
-                let newDistance = minDistance + value neighbour
-                in  case distance neighbour of
-                    Nothing -> undefined
-                    Just d  -> undefined
+    let (minElement@(QElement dist pos), newQ) = deleteFindMin q
+        neighbours = getNeighbours m minElement
+    in  if pos == p then dist
+        else dijkstra p (foldr update m neighbours) (foldr insert newQ neighbours)
+        where update (QElement _ pos) = markVisited pos
 
-findShortestPathLength :: Matrix Element -> Distance
+findShortestPathLength :: Matrix MElement -> Distance
 findShortestPathLength m =
-    let initialElement = m ! (1, 1)
-        initialMinQ = singleton $ PQE initialElement $ value initialElement
+    let MElement value _ = m ! (1, 1)
+        initialMinQ = singleton $ QElement value (1, 1)
         lastPos = (nrows m, ncols m)
     in  dijkstra lastPos m initialMinQ
 
-
-setInitial :: Matrix Element -> Matrix Element
+setInitial :: Matrix MElement -> Matrix MElement
 setInitial m =
-    let v = value $ m ! (1, 1)
-    in unsafeSet (Element v (Just v) (1, 1)) (1, 1) m
+    let MElement v _ = m ! (1, 1)
+    in  unsafeSet (MElement v True) (1, 1) m
 
-initElement :: Matrix Integer -> Position -> Element
+initElement :: Matrix Integer -> Position -> MElement
 initElement m p =
     let value = m ! p
-    in  Element value Nothing p
+    in  MElement value False
 
-toElementMatrix :: Matrix Integer -> Matrix Element
+toElementMatrix :: Matrix Integer -> Matrix MElement
 toElementMatrix m =
     matrix (nrows m) (ncols m) (initElement m)
 
