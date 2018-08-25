@@ -48,14 +48,16 @@ int main(void) {
     srand(time(NULL));
 
     for (int i = 0; i < rolls; i++) {
-        int die1 = rand() / ((double) RAND_MAX + 1) * 6 + 1;
-        int die2 = rand() / ((double) RAND_MAX + 1) * 6 + 1;
+        int die1 = (rand() % 4) + 1;
+        int die2 = (rand() % 4) + 1;
         position = (position + die1 + die2) % 40;
         if (die1 == die2) {
-            doubleRolls = (doubleRolls + 1) % 3;
-            if (doubleRolls == 0) {
+            if (++doubleRolls == 3) {
+                doubleRolls = 0;
                 position = JAIL;
             }
+        } else {
+            doubleRolls = 0;
         }
         if (position == G2J) {
             position = JAIL;
@@ -75,9 +77,9 @@ int main(void) {
             if (freq[j] > topValue) {
                 topSquare = j;
                 topValue  = freq[j];
-                freq[j]   = 0;
             }
         }
-        printf("#%d: %d @ %f%%\n", i, topSquare, (float) topValue / rolls * 100);
+        freq[topSquare] = 0;
+        printf("#%d: %02d @ %f%%\n", i, topSquare, (double) topValue / rolls * 100);
     }
 }
