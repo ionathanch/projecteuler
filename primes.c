@@ -8,7 +8,7 @@
  *  runs in O(sqrt(n))
  *
  */
-bool isPrime (long n) {
+bool isPrime(long n) {
     if (n == 0 || n == 1)
         return false;
 
@@ -26,7 +26,7 @@ bool isPrime (long n) {
  *  runs in O(sqrt(n)/ln(n))
  *
  */
-bool isPrimeMem (long n, long* primes) {
+bool isPrimeMem(long n, long* primes) {
     if (n == 0 || n == 1)
         return false;
     if (n == 2 || n == 3)
@@ -50,15 +50,15 @@ bool isPrimeMem (long n, long* primes) {
  *      where the 0-based ith element is true if i is prime
  *  returns: number of primes in *primes_ptr
  *
- *  N.B. numOfPrimesUpper is an upper-bound of 
- *      the prime-counting function, given by 
+ *  N.B. numOfPrimesUpper is an upper-bound of
+ *      the prime-counting function, given by
  *      n/ln(n) * 1.25506
  *
  *  runs in O(n * sqrt(n)/ln(n)) (not a tight bound)
  *
  */
 
-long listOfPrimes (long n, long** primes_ptr, bool** primesTable_ptr) {
+long listOfPrimes(long n, long** primes_ptr, bool** primesTable_ptr) {
     *primesTable_ptr = calloc (n + 1, sizeof (bool));
 
     if (n == 0 || n == 1) {
@@ -66,23 +66,23 @@ long listOfPrimes (long n, long** primes_ptr, bool** primesTable_ptr) {
         return 0;
     }
 
-    long numOfPrimesUpper = (long) (n/log(n) * 1.25506); 
+    long numOfPrimesUpper = (long) (n/log(n) * 1.25506);
     *primes_ptr = malloc (sizeof (long) * numOfPrimesUpper);
     long numOfPrimes = 0;
     for (long i = 0; i <= n; i++) {
-        if (isPrimeMem (i, *primes_ptr)) {
+        if (isPrimeMem(i, *primes_ptr)) {
             (*primes_ptr)[numOfPrimes] = i;
             (*primesTable_ptr)[i] = true;
             numOfPrimes++;
         }
     }
     if (numOfPrimes < numOfPrimesUpper) {
-        long* tmp = realloc (*primes_ptr, 
+        long* tmp = realloc (*primes_ptr,
                              sizeof (long) * numOfPrimes);
         if (tmp != NULL)
             *primes_ptr = tmp;
     }
-    
+
     return numOfPrimes;
 }
 
@@ -92,7 +92,7 @@ long listOfPrimes (long n, long** primes_ptr, bool** primesTable_ptr) {
  *  runs in O(n ln(ln(n))) apparently
  *
  */
-void sieveOfEratosthenes (int n, bool** primesTable_ptr) {
+void sieveOfEratosthenes(int n, bool** primesTable_ptr) {
     *primesTable_ptr = malloc (sizeof (bool) * (n + 1));
     for (int i = 0; i <= n; i++)
         (*primesTable_ptr)[i] = true;
