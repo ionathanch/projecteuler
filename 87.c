@@ -14,16 +14,16 @@ int main(void) {
     long* primes;
     bool* primesTable;
     int length = listOfPrimes(sqrt(SIZE - 24), &primes, &primesTable);
-    //bool visited[SIZE] = {false};
+    bool* visited = calloc(SIZE, sizeof(bool));
     int count = 0;
 
     for (int i = 0; i < length && primes[i] <= 7069; i++) {
         for (int j = 0; j < length && primes[j] <= 367; j++) {
             for (int k = 0; k < length && primes[k] <= 83; k++) {
                 int n = pow(primes[i], 2) + pow(primes[j], 3) + pow(primes[k], 4);
-                if (n < SIZE) { //&& !visited[n]) {
+                if (n < SIZE && !visited[n]) {
                     count++;
-                    //visited[n] = true;
+                    visited[n] = true;
                 }
             }
         }
@@ -33,4 +33,5 @@ int main(void) {
 
     free(primes);
     free(primesTable);
+    free(visited);
 }
